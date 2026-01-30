@@ -41,13 +41,22 @@
       "title": "PLANETARY NEBULA",
       "path": "low",
       "start": 11,
-      "end": 11.1,
+      "end": 11.05,
       "imageUrl": "photos/planetarynebula.jpg",
       "description": "Outer layers are expelled into space, leaving the core behind."
     },
     {
+      "id": "white-dwarf",
+      "title": "WHITE DWARF",
+      "path": "low",
+      "start": 11.05,
+      "end": 11.1,
+      "imageUrl": "photos/whitedwarf.jpg",
+      "description": "The core remains as a dense white dwarf."
+    },
+    {
       "id": "black-dwarf",
-      "title": "WHITE → BLACK DWARF",
+      "title": "BLACK DWARF",
       "path": "low",
       "start": 11.1,
       "end": 100,
@@ -68,7 +77,7 @@
       "title": "SUPERGIANT",
       "path": "high",
       "start": 0.5,
-      "end": 0.6,
+      "end": 0.51,
       "imageUrl": "photos/supergiant.png",
       "description": "The star expands as it fuses heavier elements in its core."
     },
@@ -76,19 +85,30 @@
       "id": "supernova",
       "title": "SUPERNOVA",
       "path": "high",
-      "start": 0.6,
-      "end": 0.601,
-      "imageUrl": "photos/supergiant.png",
+      "start": 0.51,
+      "end": 0.51001,
+      "imageUrl": "photos/supernova.jpg",
       "description": "The core collapses, causing a catastrophic stellar explosion."
     },
     {
       "id": "neutron-star",
-      "title": "NEUTRON STAR / BLACK HOLE",
+      "title": "NEUTRON STAR",
       "path": "high",
-      "start": 0.601,
+      "branch": "left",
+      "start": 0.51001,
       "end": 100,
       "imageUrl": "photos/neutronstar.jpg",
-      "description": "The collapsed core remains as a neutron star or black hole."
+      "description": "If the remaining core is 1.4–3 solar masses, it becomes a neutron star."
+    },
+    {
+      "id": "black-hole",
+      "title": "BLACK HOLE",
+      "path": "high",
+      "branch": "right",
+      "start": 0.51001,
+      "end": 100,
+      "imageUrl": "photos/blackhole.jpg",
+      "description": "If the core is above ~3 solar masses, it collapses into a black hole."
     }
   ]
 }
