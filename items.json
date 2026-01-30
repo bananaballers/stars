@@ -1,0 +1,94 @@
+{
+  "stages": [
+    {
+      "id": "nebula",
+      "title": "NEBULA",
+      "path": "shared",
+      "start": 0,
+      "end": 0.01,
+      "imageUrl": "photos/nebula.jpg",
+      "description": "A cloud of gas and dust collapses under gravity, beginning star formation."
+    },
+    {
+      "id": "protostar",
+      "title": "PROTOSTAR",
+      "path": "shared",
+      "start": 0.01,
+      "end": 0.05,
+      "imageUrl": "photos/protostar.jpg",
+      "description": "The forming star heats up as it gathers mass, but fusion has not yet begun."
+    },
+    {
+      "id": "low-mass-main-sequence",
+      "title": "LOW MASS MAIN SEQUENCE",
+      "path": "low",
+      "start": 0.05,
+      "end": 10,
+      "imageUrl": "photos/lowmass-ss.jpeg",
+      "description": "A small star steadily fuses hydrogen and can live for billions of years."
+    },
+    {
+      "id": "red-giant",
+      "title": "RED GIANT",
+      "path": "low",
+      "start": 10,
+      "end": 11,
+      "imageUrl": "photos/redgiant.jpg",
+      "description": "Hydrogen is exhausted, causing the star to expand and cool."
+    },
+    {
+      "id": "planetary-nebula",
+      "title": "PLANETARY NEBULA",
+      "path": "low",
+      "start": 11,
+      "end": 11.1,
+      "imageUrl": "photos/planetarynebula.jpg",
+      "description": "Outer layers are expelled into space, leaving the core behind."
+    },
+    {
+      "id": "black-dwarf",
+      "title": "WHITE → BLACK DWARF",
+      "path": "low",
+      "start": 11.1,
+      "end": 100,
+      "imageUrl": "photos/blackdwarf.jpg",
+      "description": "The stellar core cools over trillions of years into a black dwarf."
+    },
+    {
+      "id": "high-mass-main-sequence",
+      "title": "HIGH MASS MAIN SEQUENCE",
+      "path": "high",
+      "start": 0.05,
+      "end": 0.5,
+      "imageUrl": "photos/main-ss.png",
+      "description": "A massive star burns fuel rapidly and has a short lifespan."
+    },
+    {
+      "id": "supergiant",
+      "title": "SUPERGIANT",
+      "path": "high",
+      "start": 0.5,
+      "end": 0.6,
+      "imageUrl": "photos/supergiant.png",
+      "description": "The star expands as it fuses heavier elements in its core."
+    },
+    {
+      "id": "supernova",
+      "title": "SUPERNOVA",
+      "path": "high",
+      "start": 0.6,
+      "end": 0.601,
+      "imageUrl": "photos/supergiant.png",
+      "description": "The core collapses, causing a catastrophic stellar explosion."
+    },
+    {
+      "id": "neutron-star",
+      "title": "NEUTRON STAR / BLACK HOLE",
+      "path": "high",
+      "start": 0.601,
+      "end": 100,
+      "imageUrl": "photos/neutronstar.jpg",
+      "description": "The collapsed core remains as a neutron star or black hole."
+    }
+  ]
+}

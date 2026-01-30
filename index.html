@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stellar Lifecycle Timeline</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .stage {
+      height: 2000vh;
+    }
+
+    .scene {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1000px;
+    }
+
+    .shared,
+    .split {
+      display: none;
+      width: 100%;
+      justify-content: center;
+      gap: 100px;
+    }
+
+    .active {
+      display: flex;
+    }
+
+    .card {
+      width: 520px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 40px;
+      border-radius: 30px;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(255, 255, 255, 0.02);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .card:hover {
+      transform: translateY(-10px) scale(1.02);
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    img {
+      width: 100%;
+      height: 520px;
+      object-fit: cover;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
+
+    p {
+      font-size: 17px;
+      line-height: 1.8;
+      color: #fff;
+      margin-bottom: 24px;
+      font-weight: 300;
+      opacity: 0.9;
+    }
+
+    .year {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .label {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.4em;
+      margin-bottom: 30px;
+      color: #fff;
+      text-transform: uppercase;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .year-overlay {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 100px;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.4);
+      pointer-events: none;
+      z-index: 100;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .year-label {
+      position: fixed;
+      bottom: 140px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      letter-spacing: 0.5em;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <section class="stage">
+    <div class="scene">
+      <div class="year-label">Elapsed Years</div>
+      <div class="year-overlay" id="yearOverlay">0</div>
+      <div class="shared active" id="shared"></div>
+
+      <div class="split" id="split">
+        <div>
+          <div class="label">LOW MASS STAR</div>
+          <div id="low"></div>
+        </div>
+        <div>
+          <div class="label">HIGH MASS STAR</div>
+          <div id="high"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    fetch("items.json")
+      .then(r => r.json())
+      .then(d => init(d.stages));
+
+    function init(stages) {
+      const sharedStages = stages.filter(s => s.path === "shared");
+      const lowStages = stages.filter(s => s.path === "low");
+      const highStages = stages.filter(s => s.path === "high");
+
+      const nodes = {
+        shared: createCard(),
+        low: createCard(),
+        high: createCard()
+      };
+
+      document.getElementById("shared").appendChild(nodes.shared);
+      document.getElementById("low").appendChild(nodes.low);
+      document.getElementById("high").appendChild(nodes.high);
+
+      let last = { shared: null, low: null, high: null };
+
+      ScrollTrigger.create({
+        trigger: ".stage",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: true,
+        pin: ".scene",
+        onUpdate: self => update(self.progress)
+      });
+
+      function update(progress) {
+        // Cubic mapping to give SIGNIFICANTLY more weight to early stages
+        // 0.5 progress = 12.5 years (billion). 0.1 progress = 0.1 years (billion).
+        const maxYearBillion = 100;
+        const yearBillion = maxYearBillion * Math.pow(progress, 3);
+        const actualYears = Math.floor(yearBillion * 1_000_000_000);
+
+        document.getElementById("yearOverlay").textContent = actualYears.toLocaleString();
+
+        if (yearBillion < 0.05) {
+          toggle(true);
+          render(findStage(sharedStages, yearBillion), nodes.shared, "shared");
+        } else {
+          toggle(false);
+          render(findStage(lowStages, yearBillion), nodes.low, "low");
+          render(findStage(highStages, yearBillion), nodes.high, "high");
+        }
+      }
+
+      function toggle(shared) {
+        const sharedEl = document.getElementById("shared");
+        const splitEl = document.getElementById("split");
+
+        if (shared && !sharedEl.classList.contains("active")) {
+          gsap.to(splitEl, {
+            opacity: 0, duration: 0.5, onComplete: () => {
+              splitEl.classList.remove("active");
+              sharedEl.classList.add("active");
+              gsap.fromTo(sharedEl, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 });
+            }
+          });
+        } else if (!shared && !splitEl.classList.contains("active")) {
+          gsap.to(sharedEl, {
+            opacity: 0, duration: 0.5, onComplete: () => {
+              sharedEl.classList.remove("active");
+              splitEl.classList.add("active");
+              gsap.fromTo(splitEl, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 });
+            }
+          });
+        }
+      }
+
+      function findStage(list, year) {
+        // Return the stage where year is within [start, end)
+        return list.find(s => year >= s.start && year < s.end);
+      }
+
+      function render(stage, card, key) {
+        if (!stage || last[key] === stage.id) return;
+        last[key] = stage.id;
+
+        const img = card.querySelector("img");
+        const h1 = card.querySelector("h1");
+        const p = card.querySelector("p");
+        const yr = card.querySelector(".year");
+
+        // Use GSAP for smooth content transitions
+        gsap.to(card, {
+          opacity: 0, y: 10, duration: 0.3, onComplete: () => {
+            img.src = stage.imageUrl;
+            h1.textContent = stage.title;
+            p.textContent = stage.description;
+            yr.textContent = `${stage.start} – ${stage.end} billion years`;
+            gsap.to(card, { opacity: 1, y: 0, duration: 0.4 });
+          }
+        });
+      }
+
+      function createCard() {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="year"></div>
+          <img />
+          <h1></h1>
+          <p></p>
+        `;
+        return card;
+      }
+    }
+  </script>
+</body>
+
+</html>

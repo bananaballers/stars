@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stellar Track Selection</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+        }
+
+        #selection {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 50px;
+            transition: opacity 1s ease, visibility 1s;
+        }
+
+        #selection h1 {
+            font-size: 40px;
+            letter-spacing: 0.3em;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #fff 0%, #666 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .selector-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .selector-card {
+            width: 320px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .selector-card:hover {
+            transform: translateY(-20px) scale(1.05);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 255, 255, 0.1);
+        }
+
+        .selector-card h2 {
+            font-size: 24px;
+            letter-spacing: 0.2em;
+            margin-bottom: 10px;
+            z-index: 2;
+        }
+
+        .selector-card p {
+            font-size: 14px;
+            opacity: 0.6;
+            letter-spacing: 0.1em;
+            z-index: 2;
+        }
+
+        .selector-card .bg-glow {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            top: -50%;
+            left: -50%;
+            transition: opacity 0.6s ease;
+            opacity: 0;
+        }
+
+        .selector-card:hover .bg-glow {
+            opacity: 1;
+        }
+
+        /* Timeline Styles */
+        #timeline {
+            display: none;
+            opacity: 0;
+        }
+
+        .stage {
+            height: 1500vh;
+        }
+
+        .scene {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+            position: sticky;
+            top: 0;
+            width: 100%;
+        }
+
+        #card-container {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            width: 100%;
+        }
+
+        .split-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .split-label {
+            font-size: 11px;
+            letter-spacing: 0.4em;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .card {
+            width: 520px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 40px;
+            border-radius: 30px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card.small {
+            width: 440px;
+        }
+
+        .card.small img {
+            height: 440px;
+        }
+
+        img {
+            width: 100%;
+            height: 520px;
+            object-fit: cover;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .card h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .card p {
+            font-size: 17px;
+            line-height: 1.8;
+            color: #fff;
+            margin-bottom: 24px;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        .year {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .year-overlay {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 100px;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.4);
+            pointer-events: none;
+            z-index: 100;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .year-label {
+            position: fixed;
+            bottom: 140px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            letter-spacing: 0.5em;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            font-weight: bold;
+            z-index: 100;
+        }
+
+        .track-indicator {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            font-size: 11px;
+            letter-spacing: 0.4em;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            font-weight: 800;
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+            padding-left: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="selection">
+        <h1>CHOOSE A PATH</h1>
+        <div class="selector-container">
+            <div class="selector-card" onclick="startTrack('low')">
+                <div class="bg-glow"></div>
+                <h2>LOW MASS</h2>
+                <p>Like our Sun</p>
+            </div>
+            <div class="selector-card" onclick="startTrack('high')">
+                <div class="bg-glow"></div>
+                <h2>HIGH MASS</h2>
+                <p>The Giants</p>
+            </div>
+            <div class="selector-card" onclick="startTrack('both')">
+                <div class="bg-glow"></div>
+                <h2>BOTH PATHS</h2>
+                <p>Compare tracks</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="timeline">
+        <div class="track-indicator" id="trackName"></div>
+        <div class="year-label">Elapsed Years</div>
+        <div class="year-overlay" id="yearOverlay">0</div>
+
+        <section class="stage">
+            <div class="scene">
+                <div id="card-container"></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        let allStages = [];
+        let activeTrack = null;
+        let lastStageIds = { single: null, low: null, high: null };
+
+        fetch("../items.json")
+            .then(r => r.json())
+            .then(d => {
+                allStages = d.stages;
+            });
+
+        function startTrack(type) {
+            activeTrack = type;
+            lastStageIds = { single: null, low: null, high: null }; // Reset state
+            document.getElementById("trackName").textContent = type === 'both' ? 'Dual track lifecycle' : type + " mass lifecycle";
+
+            // Hide selection, show timeline
+            const sel = document.getElementById("selection");
+            const time = document.getElementById("timeline");
+
+            gsap.to(sel, {
+                opacity: 0, duration: 1, onComplete: () => {
+                    sel.style.visibility = "hidden";
+                    time.style.display = "block";
+                    gsap.to(time, { opacity: 1, duration: 1 });
+                    initTimeline();
+                }
+            });
+        }
+
+        function initTimeline() {
+            const container = document.getElementById("card-container");
+            container.innerHTML = ''; // Clear container
+
+            ScrollTrigger.create({
+                trigger: ".stage",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: true,
+                onUpdate: self => update(self.progress, container)
+            });
+        }
+
+        function update(progress, container) {
+            const maxYearBillion = 100;
+            // Use cubic mapping for early stage focus
+            const yearBillion = maxYearBillion * Math.pow(progress, 3);
+            const actualYears = Math.floor(yearBillion * 1_000_000_000);
+
+            document.getElementById("yearOverlay").textContent = actualYears.toLocaleString();
+
+            if (activeTrack === 'both') {
+                handleBothTrack(yearBillion, container);
+            } else {
+                handleSingleTrack(yearBillion, container);
+            }
+        }
+
+        function handleSingleTrack(year, container) {
+            const stages = allStages.filter(s => s.path === "shared" || s.path === activeTrack);
+            const stage = stages.find(s => year >= s.start && year < s.end);
+
+            if (!container.querySelector('.card')) {
+                container.appendChild(createCard());
+            }
+
+            const card = container.querySelector('.card');
+            if (stage && lastStageIds.single !== stage.id) {
+                lastStageIds.single = stage.id;
+                renderCard(card, stage);
+            }
+        }
+
+        function handleBothTrack(year, container) {
+            const sharedStages = allStages.filter(s => s.path === "shared");
+            const lowStages = allStages.filter(s => s.path === "low");
+            const highStages = allStages.filter(s => s.path === "high");
+
+            if (year < 0.05) {
+                // Shared stage
+                if (container.querySelector('.split-col')) {
+                    container.innerHTML = '';
+                    container.appendChild(createCard());
+                } else if (!container.querySelector('.card')) {
+                    container.appendChild(createCard());
+                }
+
+                const stage = sharedStages.find(s => year >= s.start && year < s.end);
+                const card = container.querySelector('.card');
+                if (stage && lastStageIds.single !== stage.id) {
+                    lastStageIds.single = stage.id;
+                    renderCard(card, stage);
+                }
+            } else {
+                // Split stage
+                if (container.querySelector('.card:not(.small)')) {
+                    container.innerHTML = `
+            <div class="split-col">
+              <div class="split-label">Low Mass</div>
+              <div id="low-card-slot"></div>
+            </div>
+            <div class="split-col">
+              <div class="split-label">High Mass</div>
+              <div id="high-card-slot"></div>
+            </div>
+          `;
+                    document.getElementById('low-card-slot').appendChild(createCard(true));
+                    document.getElementById('high-card-slot').appendChild(createCard(true));
+                }
+
+                const lowStage = lowStages.find(s => year >= s.start && year < s.end);
+                const highStage = highStages.find(s => year >= s.start && year < s.end);
+
+                const lowCard = document.getElementById('low-card-slot')?.querySelector('.card');
+                const highCard = document.getElementById('high-card-slot')?.querySelector('.card');
+
+                if (lowStage && lastStageIds.low !== lowStage.id && lowCard) {
+                    lastStageIds.low = lowStage.id;
+                    renderCard(lowCard, lowStage);
+                }
+                if (highStage && lastStageIds.high !== highStage.id && highCard) {
+                    lastStageIds.high = highStage.id;
+                    renderCard(highCard, highStage);
+                }
+            }
+        }
+
+        function renderCard(card, stage) {
+            const img = card.querySelector("img");
+            const h1 = card.querySelector("h1");
+            const p = card.querySelector("p");
+            const yr = card.querySelector(".year");
+
+            gsap.to(card, {
+                opacity: 0, y: 20, duration: 0.4, onComplete: () => {
+                    img.src = "../" + stage.imageUrl;
+                    h1.textContent = stage.title;
+                    p.textContent = stage.description;
+                    yr.textContent = `${stage.start} – ${stage.end} billion years`;
+                    gsap.to(card, { opacity: 1, y: 0, duration: 0.6 });
+                }
+            });
+        }
+
+        function createCard(small = false) {
+            const card = document.createElement("div");
+            card.className = "card" + (small ? " small" : "");
+            card.innerHTML = `
+        <div class="year"></div>
+        <img />
+        <h1></h1>
+        <p></p>
+      `;
+            return card;
+        }
+    </script>
+</body>
+
+</html>
