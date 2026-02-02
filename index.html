@@ -8,6 +8,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"
@@ -34,159 +35,391 @@
       perspective: 1000px;
     }
 
-    .shared,
-    .split {
-      display: none;
-      width: 100%;
+    .timeline-container {
+      display: flex;
+      flex-direction: row;
       justify-content: center;
-      gap: 100px;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      gap: 20px;
+      padding: 0 20px;
+      max-width: 1800px;
+      margin: 0 auto;
     }
 
-    .active {
+    .path-column {
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.5s ease;
+      opacity: 0;
+      transform: translateY(20px);
+      flex: 1;
+      min-width: 0;
+      /* Allow shrinking */
+    }
+
+    .path-column.active {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .card {
-      width: 520px;
-      text-align: center;
+      width: 100%;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(10px, 2vh, 20px);
       background: rgba(255, 255, 255, 0.04);
-      padding: 40px;
-      border-radius: 30px;
+      padding: clamp(16px, 3%, 32px);
+      border-radius: clamp(20px, 4vw, 32px);
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.15);
       box-shadow:
         0 20px 50px rgba(0, 0, 0, 0.6),
         0 0 40px rgba(255, 255, 255, 0.02);
       transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .state-1 .card {
+      flex-direction: row;
+      text-align: left;
+      max-width: 900px;
+      gap: 40px;
+    }
+
+    .state-1 .card-content {
+      text-align: left;
     }
 
     .card:hover {
-      transform: translateY(-10px) scale(1.02);
+      transform: translateY(-8px) scale(1.01);
       border-color: rgba(255, 255, 255, 0.3);
       background: rgba(255, 255, 255, 0.06);
     }
 
-    img {
+    .card img {
       width: 100%;
-      height: 520px;
+      max-width: 280px;
+      height: auto;
+      aspect-ratio: 1/1;
       object-fit: cover;
       border-radius: 20px;
-      margin-bottom: 30px;
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+      flex-shrink: 0;
+      transition: all 0.5s ease;
+    }
+
+    .state-1 .card img {
+      max-width: clamp(200px, 40%, 450px);
+    }
+
+    /* Adjust sizing when 3 columns are present */
+    .state-3 .card img {
+      max-width: clamp(120px, 15vw, 220px);
+    }
+
+    .card-content {
+      flex: 1;
+      min-width: 0;
     }
 
     h1 {
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: 0.15em;
-      margin-bottom: 16px;
+      font-size: clamp(16px, 2.5vw, 22px);
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      margin: 0 0 8px 0;
       background: linear-gradient(135deg, #fff 0%, #aaa 100%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
       text-transform: uppercase;
+      word-wrap: break-word;
     }
 
     p {
-      font-size: 17px;
-      line-height: 1.8;
+      font-size: clamp(12px, 1.4vw, 15px);
+      line-height: 1.5;
       color: #fff;
-      margin-bottom: 24px;
+      margin-bottom: 12px;
       font-weight: 300;
-      opacity: 0.9;
+      opacity: 0.8;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card {
+      max-height: 85vh;
+      overflow-y: auto;
+      scrollbar-width: none;
+      /* Hide scrollbar for cleaner look */
+    }
+
+    .card::-webkit-scrollbar {
+      display: none;
     }
 
     .year {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
-      letter-spacing: 0.3em;
-      color: rgba(255, 255, 255, 0.9);
-      margin-bottom: 12px;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 10px;
       text-transform: uppercase;
     }
 
     .label {
       text-align: center;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 900;
       letter-spacing: 0.4em;
-      margin-bottom: 30px;
-      color: #fff;
+      margin-bottom: 24px;
+      color: rgba(255, 255, 255, 0.6);
       text-transform: uppercase;
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+      height: 18px;
     }
 
     .year-overlay {
       position: fixed;
-      bottom: 40px;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 100px;
+      font-size: 80px;
       font-weight: 900;
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 0.25);
       pointer-events: none;
       z-index: 100;
       white-space: nowrap;
       font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
     }
 
     .year-label {
       position: fixed;
-      bottom: 140px;
+      bottom: 110px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 12px;
-      letter-spacing: 0.5em;
-      color: rgba(255, 255, 255, 0.5);
+      font-size: 10px;
+      letter-spacing: 0.6em;
+      color: rgba(255, 255, 255, 0.4);
       text-transform: uppercase;
-      font-weight: bold;
+      font-weight: 800;
+    }
+
+    #splash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, #111 0%, #000 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.2s;
+    }
+
+    #splash.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .splash-content {
+      text-align: center;
+      animation: splashFadeIn 2s ease-out;
+    }
+
+    .splash-title {
+      font-size: 64px;
+      font-weight: 900;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff 0%, #444 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.3em;
+      filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.1));
+    }
+
+    .splash-subtitle {
+      font-size: 16px;
+      letter-spacing: 0.8em;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      margin-bottom: 60px;
+      font-weight: 300;
+    }
+
+    .skip-btn {
+      padding: 18px 48px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-family: 'Outfit';
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      cursor: pointer;
+      border-radius: 100px;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      backdrop-filter: blur(20px);
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+
+    .skip-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    @keyframes splashFadeIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.95);
+        filter: blur(10px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+      }
+    }
+
+    .new-star-btn {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      padding: 24px 60px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-family: 'Outfit';
+      font-weight: 900;
+      letter-spacing: 0.5em;
+      cursor: pointer;
+      border-radius: 100px;
+      transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+      backdrop-filter: blur(30px);
+      text-transform: uppercase;
+      font-size: 20px;
+      opacity: 0;
+      visibility: hidden;
+      z-index: 1000;
+      box-shadow: 0 0 50px rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+    }
+
+    .new-star-btn .progress-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      background-color: rgba(255, 255, 255, 0.15);
+      z-index: -1;
+      transition: width 0.1s linear;
+    }
+
+
+    .new-star-btn.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .new-star-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.6);
+      transform: translate(-50%, -52%) scale(1.05);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.2);
     }
   </style>
 </head>
 
 <body>
+  <div id="splash">
+    <div class="splash-content">
+      <div class="splash-subtitle">Brought to you by</div>
+      <div class="splash-title">BANANA BALLERS</div>
+      <button class="skip-btn" id="skipBtn">ENTER EXPERIENCE</button>
+    </div>
+  </div>
+
+  <button id="newStarBtn" class="new-star-btn">
+    <div class="progress-fill" id="btnProgress"></div>
+    <span>NEW STAR</span>
+  </button>
+
+
+
   <section class="stage">
     <div class="scene">
       <div class="year-label">Elapsed Years</div>
       <div class="year-overlay" id="yearOverlay">0</div>
-      <div class="shared active" id="shared"></div>
 
-      <div class="split" id="split">
-        <div>
-          <div class="label">LOW MASS STAR</div>
-          <div id="low"></div>
+      <div class="timeline-container">
+        <!-- Path 1 (Low Mass / Left) -->
+        <div id="col-left" class="path-column">
+          <div class="label" id="label-left"></div>
+          <div id="content-left"></div>
         </div>
-        <div>
-          <div class="label">HIGH MASS STAR</div>
-          <div id="high"></div>
+
+        <!-- Path 2 (Middle / Shared) -->
+        <div id="col-mid" class="path-column">
+          <div class="label" id="label-mid"></div>
+          <div id="content-mid"></div>
+        </div>
+
+        <!-- Path 3 (Right / High Mass) -->
+        <div id="col-right" class="path-column">
+          <div class="label" id="label-right"></div>
+          <div id="content-right"></div>
         </div>
       </div>
     </div>
   </section>
 
   <script>
-    gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
 
     fetch("items.json")
       .then(r => r.json())
       .then(d => init(d.stages));
 
     function init(stages) {
-      const sharedStages = stages.filter(s => s.path === "shared");
-      const lowStages = stages.filter(s => s.path === "low");
-      const highStages = stages.filter(s => s.path === "high");
-
-      const nodes = {
-        shared: createCard(),
-        low: createCard(),
-        high: createCard()
+      let currentProgress = 0;
+      const paths = {
+        left: { col: document.getElementById("col-left"), content: document.getElementById("content-left"), label: document.getElementById("label-left") },
+        mid: { col: document.getElementById("col-mid"), content: document.getElementById("content-mid"), label: document.getElementById("label-mid") },
+        right: { col: document.getElementById("col-right"), content: document.getElementById("content-right"), label: document.getElementById("label-right") }
       };
 
-      document.getElementById("shared").appendChild(nodes.shared);
-      document.getElementById("low").appendChild(nodes.low);
-      document.getElementById("high").appendChild(nodes.high);
+      const nodes = {
+        left: createCard(),
+        mid: createCard(),
+        right: createCard()
+      };
 
-      let last = { shared: null, low: null, high: null };
+      paths.left.content.appendChild(nodes.left);
+      paths.mid.content.appendChild(nodes.mid);
+      paths.right.content.appendChild(nodes.right);
+
+      let lastIds = { left: null, mid: null, right: null };
+      let lastState = null; // 1, 2, or 3 path split
 
       ScrollTrigger.create({
         trigger: ".stage",
@@ -198,65 +431,92 @@
       });
 
       function update(progress) {
-        // Cubic mapping to give SIGNIFICANTLY more weight to early stages
-        // 0.5 progress = 12.5 years (billion). 0.1 progress = 0.1 years (billion).
+        currentProgress = progress;
         const maxYearBillion = 100;
+
         const yearBillion = maxYearBillion * Math.pow(progress, 3);
         const actualYears = Math.floor(yearBillion * 1_000_000_000);
-
         document.getElementById("yearOverlay").textContent = actualYears.toLocaleString();
 
-        if (yearBillion < 0.05) {
-          toggle(true);
-          render(findStage(sharedStages, yearBillion), nodes.shared, "shared");
+        if (progress >= 0.999) {
+          document.getElementById("newStarBtn").classList.add("visible");
         } else {
-          toggle(false);
-          render(findStage(lowStages, yearBillion), nodes.low, "low");
-          render(findStage(highStages, yearBillion), nodes.high, "high");
+          document.getElementById("newStarBtn").classList.remove("visible");
+        }
+
+        let state = 1;
+        if (yearBillion >= 4.0) state = 3; // Split after supernova (now ends at 4.0)
+        else if (yearBillion >= 0.05) state = 2;
+
+        updateLayout(state);
+
+        if (state === 1) {
+          const s = stages.find(s => s.path === "shared" && yearBillion >= s.start && yearBillion < s.end);
+          render(s, nodes.mid, "mid");
+          paths.mid.label.textContent = "STARS ORIGIN";
+        } else if (state === 2) {
+          const low = stages.find(s => s.path === "low" && yearBillion >= s.start && yearBillion < s.end);
+          const high = stages.find(s => s.path === "high" && !s.branch && yearBillion >= s.start && yearBillion < s.end);
+
+          render(low, nodes.left, "left");
+          render(high, nodes.right, "right");
+
+          paths.left.label.textContent = low ? low.title : "LOW MASS STAR";
+          paths.right.label.textContent = high ? high.title : "HIGH MASS STAR";
+        } else if (state === 3) {
+          const low = stages.find(s => s.path === "low" && yearBillion >= s.start && yearBillion < s.end);
+          const neutron = stages.find(s => s.path === "high" && s.branch === "left" && yearBillion >= s.start && yearBillion < s.end);
+          const blackhole = stages.find(s => s.path === "high" && s.branch === "right" && yearBillion >= s.start && yearBillion < s.end);
+
+          render(low, nodes.left, "left");
+          render(neutron, nodes.mid, "mid");
+          render(blackhole, nodes.right, "right");
+
+          paths.left.label.textContent = low ? low.title : "LOW MASS STAR";
+          paths.mid.label.textContent = neutron ? neutron.title : "NEUTRON STAR";
+          paths.right.label.textContent = blackhole ? blackhole.title : "BLACK HOLE";
         }
       }
 
-      function toggle(shared) {
-        const sharedEl = document.getElementById("shared");
-        const splitEl = document.getElementById("split");
+      function updateLayout(state) {
+        if (lastState === state) return;
+        lastState = state;
 
-        if (shared && !sharedEl.classList.contains("active")) {
-          gsap.to(splitEl, {
-            opacity: 0, duration: 0.5, onComplete: () => {
-              splitEl.classList.remove("active");
-              sharedEl.classList.add("active");
-              gsap.fromTo(sharedEl, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 });
-            }
-          });
-        } else if (!shared && !splitEl.classList.contains("active")) {
-          gsap.to(sharedEl, {
-            opacity: 0, duration: 0.5, onComplete: () => {
-              sharedEl.classList.remove("active");
-              splitEl.classList.add("active");
-              gsap.fromTo(splitEl, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 });
-            }
-          });
+        const container = document.querySelector(".timeline-container");
+        container.className = `timeline-container state-${state}`;
+
+        if (state === 1) {
+          paths.left.col.classList.remove("active");
+          paths.mid.col.classList.add("active");
+          paths.right.col.classList.remove("active");
+        } else if (state === 2) {
+          paths.left.col.classList.add("active");
+          paths.mid.col.classList.remove("active");
+          paths.right.col.classList.add("active");
+        } else if (state === 3) {
+          paths.left.col.classList.add("active");
+          paths.mid.col.classList.add("active");
+          paths.right.col.classList.add("active");
         }
-      }
-
-      function findStage(list, year) {
-        // Return the stage where year is within [start, end)
-        return list.find(s => year >= s.start && year < s.end);
       }
 
       function render(stage, card, key) {
-        if (!stage || last[key] === stage.id) return;
-        last[key] = stage.id;
+        if (!stage) {
+          gsap.to(card, { opacity: 0, duration: 0.3 });
+          lastIds[key] = null;
+          return;
+        }
+        if (lastIds[key] === stage.id) return;
+        lastIds[key] = stage.id;
 
         const img = card.querySelector("img");
         const h1 = card.querySelector("h1");
         const p = card.querySelector("p");
         const yr = card.querySelector(".year");
 
-        // Use GSAP for smooth content transitions
         gsap.to(card, {
           opacity: 0, y: 10, duration: 0.3, onComplete: () => {
-            img.src = stage.imageUrl;
+            if (stage.imageUrl) img.src = stage.imageUrl;
             h1.textContent = stage.title;
             p.textContent = stage.description;
             yr.textContent = `${stage.start} – ${stage.end} billion years`;
@@ -269,14 +529,168 @@
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
-          <div class="year"></div>
-          <img />
-          <h1></h1>
-          <p></p>
+          <img src="" alt="" />
+          <div class="card-content">
+            <div class="year"></div>
+            <h1></h1>
+            <p></p>
+          </div>
         `;
         return card;
       }
     }
+
+    // Audio Management
+    const audioFiles = {
+      music: 'photos/song.mp3',
+      click: 'photos/click.mp3'
+    };
+
+    const audio = {
+      music: new Audio(audioFiles.music),
+      click: new Audio(audioFiles.click)
+    };
+
+    audio.music.loop = true;
+
+    // Unobtrusive error handling and retrying
+    Object.keys(audio).forEach(key => {
+      audio[key].addEventListener('error', function retry() {
+        console.warn(`Audio ${key} failed to load, retrying in 5s...`);
+        setTimeout(() => {
+          this.load();
+        }, 5000);
+      });
+    });
+
+    const playClick = () => {
+      audio.click.currentTime = 0;
+      audio.click.play().catch(() => { });
+    };
+
+    const playScroll = () => {
+      // Disabled: scroll.mp3 not found
+    };
+
+
+    // Splash screen interaction
+    const skipBtn = document.getElementById('skipBtn');
+    const splash = document.getElementById('splash');
+
+    skipBtn.addEventListener('click', () => {
+      splash.classList.add('hidden');
+      audio.music.play().catch(err => console.log("Autoplay check:", err));
+      playClick();
+    });
+
+    // New Star Button
+    const newStarBtn = document.getElementById('newStarBtn');
+    const btnProgress = document.getElementById('btnProgress');
+    let pressure = 0;
+    const maxPressure = 100;
+    let isRebirthing = false;
+    let autoTriggerTimeout = null;
+
+    const triggerRebirth = () => {
+      if (isRebirthing) return;
+      isRebirthing = true;
+      pressure = 0;
+      btnProgress.style.width = '0%';
+      if (autoTriggerTimeout) clearTimeout(autoTriggerTimeout);
+
+      gsap.to(window, {
+        duration: 2.5,
+        scrollTo: 0,
+        ease: "power4.inOut",
+        onComplete: () => {
+          isRebirthing = false;
+        }
+      });
+      playClick();
+    };
+
+    newStarBtn.addEventListener('click', triggerRebirth);
+
+    // Pressure/Overscroll Logic
+    window.addEventListener('wheel', (e) => {
+      if (isRebirthing || autoTriggerTimeout || !newStarBtn.classList.contains('visible')) {
+        return;
+      }
+
+      if (e.deltaY > 0) {
+        pressure = Math.min(maxPressure, pressure + Math.abs(e.deltaY) * 0.2);
+      } else {
+        pressure = Math.max(0, pressure - 5);
+      }
+
+      btnProgress.style.width = `${(pressure / maxPressure) * 100}%`;
+
+      if (pressure >= maxPressure && !autoTriggerTimeout) {
+        btnProgress.style.backgroundColor = 'rgba(255, 255, 255, 0.4)'; // Flash feedback
+        autoTriggerTimeout = setTimeout(() => {
+          triggerRebirth();
+          autoTriggerTimeout = null;
+          btnProgress.style.backgroundColor = '';
+        }, 1500);
+      }
+    }, { passive: true });
+
+    // Touch support for pressure
+    let lastTouchY = 0;
+    window.addEventListener('touchstart', (e) => {
+      lastTouchY = e.touches[0].clientY;
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (isRebirthing || autoTriggerTimeout || !newStarBtn.classList.contains('visible')) return;
+
+      const touchY = e.touches[0].clientY;
+      const deltaY = lastTouchY - touchY;
+      lastTouchY = touchY;
+
+      if (deltaY > 0) {
+        pressure = Math.min(maxPressure, pressure + deltaY * 0.5);
+      } else {
+        pressure = Math.max(0, pressure - 10);
+      }
+
+      btnProgress.style.width = `${(pressure / maxPressure) * 100}%`;
+
+      if (pressure >= maxPressure && !autoTriggerTimeout) {
+        btnProgress.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+        autoTriggerTimeout = setTimeout(() => {
+          triggerRebirth();
+          autoTriggerTimeout = null;
+          btnProgress.style.backgroundColor = '';
+        }, 1500);
+      }
+    }, { passive: true });
+
+    // Decay pressure when not interacting
+    setInterval(() => {
+      if (pressure > 0 && !isRebirthing && !autoTriggerTimeout) {
+        pressure = Math.max(0, pressure - 2);
+        btnProgress.style.width = `${(pressure / maxPressure) * 100}%`;
+      }
+    }, 50);
+
+
+
+    // Global click listener
+    document.addEventListener('click', (e) => {
+      if (splash.classList.contains('hidden')) {
+        playClick();
+      }
+    });
+
+    // Scroll sound logic
+    let lastScrollY = window.scrollY;
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+      if (splash.classList.contains('hidden')) {
+        playScroll();
+      }
+    });
   </script>
 </body>
 
