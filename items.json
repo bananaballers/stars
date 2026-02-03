@@ -7,7 +7,7 @@
       "start": 0,
       "end": 0.01,
       "imageUrl": "photos/nebula.png",
-      "description": "A cloud of gas and dust collapses under gravity, beginning star formation."
+      "description": "A giant cloud of dust and gas in space"
     },
     {
       "id": "protostar",
@@ -16,7 +16,7 @@
       "start": 0.01,
       "end": 0.05,
       "imageUrl": "photos/protostar.png",
-      "description": "The forming star heats up as it gathers mass, but fusion has not yet begun."
+      "description": "Gravity pulls dust and gas together, heating it and forming a protostar"
     },
     {
       "id": "low-mass-main-sequence",
@@ -25,7 +25,7 @@
       "start": 0.05,
       "end": 10,
       "imageUrl": "photos/lowmass-ss.png",
-      "description": "A small star steadily fuses hydrogen and can live for billions of years."
+      "description": "Hydrogen fuses and turns into helium in the core (this is the current stage of our sun)"
     },
     {
       "id": "red-giant",
@@ -34,7 +34,7 @@
       "start": 10,
       "end": 11,
       "imageUrl": "photos/redgiant.png",
-      "description": "Hydrogen is exhausted, causing the star to expand and cool."
+      "description": "Cooler on the surface, reddish. hydrogen is a “shell” around core"
     },
     {
       "id": "planetary-nebula",
@@ -43,7 +43,7 @@
       "start": 11,
       "end": 12,
       "imageUrl": "photos/planetarynebula.png",
-      "description": "Outer layers are expelled into space, leaving the core behind."
+      "description": "Glowing gas cloud around the newly dead core."
     },
     {
       "id": "white-dwarf",
@@ -52,7 +52,7 @@
       "start": 12,
       "end": 15,
       "imageUrl": "photos/whitedwarf.png",
-      "description": "The core remains as a dense white dwarf."
+      "description": "A hot dense stellar core that slowly cools over time"
     },
     {
       "id": "black-dwarf",
@@ -61,7 +61,7 @@
       "start": 15,
       "end": 100,
       "imageUrl": "photos/blackdwarf.png",
-      "description": "The stellar core cools over trillions of years into a black dwarf."
+      "description": "A cooled white dwarf, emits almost no radiation"
     },
     {
       "id": "high-mass-main-sequence",
@@ -70,7 +70,7 @@
       "start": 0.05,
       "end": 0.5,
       "imageUrl": "photos/main-ss.png",
-      "description": "A massive star burns fuel rapidly and has a short lifespan."
+      "description": "Formed from the gravitational collapse of protostars, burns fule faster than low mass stars."
     },
     {
       "id": "supergiant",
@@ -98,7 +98,7 @@
       "start": 4.0,
       "end": 100,
       "imageUrl": "photos/neutronstar.png",
-      "description": "If the remaining core is 1.4–3 solar masses, it becomes a neutron star."
+      "description": "If the core is small, then it turns into a radioactive body."
     },
     {
       "id": "black-hole",
@@ -108,7 +108,7 @@
       "start": 4.0,
       "end": 100,
       "imageUrl": "photos/blackhole.png",
-      "description": "If the core is above ~3 solar masses, it collapses into a black hole."
+      "description": "Only formed if the core is super massive, time and space warps around it"
     }
   ]
 }
